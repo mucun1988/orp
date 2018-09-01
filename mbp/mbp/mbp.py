@@ -106,9 +106,3 @@ class MinBagPacker(object):
             self.bag_weights.append(obg.bag_weight)
 
         self.packing_result = list(self.packing_result)
-        
-        
-
-        
-        
-    
