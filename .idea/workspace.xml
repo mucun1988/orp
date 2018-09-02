@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f0202892-da66-4860-902a-53bda535714c" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sdo/demo_greedy.py" beforeDir="false" afterPath="$PROJECT_DIR$/sdo/demo_greedy.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sdo/sdo/sdo.py" beforeDir="false" afterPath="$PROJECT_DIR$/sdo/sdo/sdo.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sdo/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/sdo/test.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -14,41 +13,49 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="sdo.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/sdo/sdo/sdo.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="201">
-              <caret line="167" selection-start-line="167" selection-end-line="167" />
-              <folding>
-                <element signature="e#0#42#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="test.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/sdo/test.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="480">
-              <caret line="32" column="20" lean-forward="true" selection-start-line="32" selection-start-column="20" selection-end-line="32" selection-end-column="20" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="demo_greedy.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/sdo/demo_greedy.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="320">
-              <caret line="33" lean-forward="true" selection-start-line="33" selection-end-line="33" />
-              <folding>
-                <element signature="e#0#19#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <splitter split-orientation="horizontal" split-proportion="0.7923323">
+      <split-first>
+        <leaf>
+          <file leaf-file-name="test.py" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/sdo/test.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="228">
+                  <caret line="27" column="28" lean-forward="true" selection-start-line="27" selection-start-column="28" selection-end-line="27" selection-end-column="28" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="demo_greedy.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/sdo/demo_greedy.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="170">
+                  <caret line="23" column="17" lean-forward="true" selection-start-line="23" selection-start-column="17" selection-end-line="23" selection-end-column="17" />
+                  <folding>
+                    <element signature="e#0#19#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-first>
+      <split-second>
+        <leaf>
+          <file leaf-file-name="sdo.py" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/sdo/sdo/sdo.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="1627">
+                  <caret line="142" column="62" selection-start-line="142" selection-start-column="62" selection-end-line="142" selection-end-column="62" />
+                  <folding>
+                    <element signature="e#0#42#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-second>
+    </splitter>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -75,11 +82,11 @@
         <option value="$PROJECT_DIR$/mbp/mbp/mbp.py" />
         <option value="$PROJECT_DIR$/gns/README.md" />
         <option value="$PROJECT_DIR$/gns/test.py" />
-        <option value="$PROJECT_DIR$/sdo/test.py" />
         <option value="$PROJECT_DIR$/gns/gns/gns.py" />
         <option value="$PROJECT_DIR$/sdo/sdo/__init__.py" />
-        <option value="$PROJECT_DIR$/sdo/sdo/sdo.py" />
         <option value="$PROJECT_DIR$/sdo/demo_greedy.py" />
+        <option value="$PROJECT_DIR$/sdo/sdo/sdo.py" />
+        <option value="$PROJECT_DIR$/sdo/test.py" />
       </list>
     </option>
   </component>
@@ -194,14 +201,14 @@
     <frame x="0" y="23" width="1440" height="836" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2532189" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.10443491" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="right" id="R Packages" order="3" />
       <window_info anchor="right" id="R Graphics" order="3" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32882273" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info active="true" anchor="bottom" id="Python Console" order="7" visible="true" weight="0.3653586" />
+      <window_info active="true" anchor="bottom" id="Python Console" order="7" visible="true" weight="0.4533153" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
@@ -217,6 +224,11 @@
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <option name="time" value="2" />
+    </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/mbp/test.py">
@@ -279,10 +291,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/sdo/demo_greedy.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="23" column="17" lean-forward="true" selection-start-line="23" selection-start-column="17" selection-end-line="23" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/sdo/sdo/sdo.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="201">
-          <caret line="167" selection-start-line="167" selection-end-line="167" />
+        <state relative-caret-position="1627">
+          <caret line="142" column="62" selection-start-line="142" selection-start-column="62" selection-end-line="142" selection-end-column="62" />
           <folding>
             <element signature="e#0#42#0" expanded="true" />
           </folding>
@@ -291,18 +313,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/sdo/test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="32" column="20" lean-forward="true" selection-start-line="32" selection-start-column="20" selection-end-line="32" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sdo/demo_greedy.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="320">
-          <caret line="33" lean-forward="true" selection-start-line="33" selection-end-line="33" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="228">
+          <caret line="27" column="28" lean-forward="true" selection-start-line="27" selection-start-column="28" selection-end-line="27" selection-end-column="28" />
         </state>
       </provider>
     </entry>

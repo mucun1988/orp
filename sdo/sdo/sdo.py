@@ -11,14 +11,18 @@ class ShelfDisplayOptimizer(object):
         L (float): length of each layer
         solver (obj): an instance of pywraplp.Solver (our core optimization engine)
     """
-    def __init__(self, q, l, m, nl, L, time_limit=-1):
-        assert len(q)==len(l), 'len(q)!=len(l)'
-        self.q = q
-        self.l = l
-        self.n = len(q) # number of products to be displayed on shelf
+    def __init__(self, skus_info, m, nl, L, time_limit=-1):
+        self.skus_info = skus_info.copy()
+        self.sku_ids = list(skus_info.keys())
+        self.n = len(self.sku_ids)  # number of products to be displayed on shelf
+        self.idx_dict = dict(zip(self.sku_ids, range(self.n)))
+        self.inv_idx_dict = dict(zip(range(self.n), self.sku_ids))
+        self.q = [skus_info[self.inv_idx_dict[i]]['q'] for i in range(self.n)]
+        self.l = [skus_info[self.inv_idx_dict[i]]['l'] for i in range(self.n)]
         self.m = m
         self.nl = nl
         self.L = L
+        self.result = skus_info.copy()
         self.time_limit=time_limit
 
         try:
@@ -127,7 +131,16 @@ class ShelfDisplayOptimizer(object):
         self.B1d = _sol_val(B1d)
         self.B2d = _sol_val(B2d)
         self.B3d = _sol_val(B3d)
+        self._post_process()
 
+    def _post_process(self):
+        for i in range(self.n):
+            shelf_layer = [(j, k) for j in range(self.m) for k in range(self.nl) if self.B3d[i][j][k] == 1]
+            self.result[self.inv_idx_dict[i]]['shelf'] = [item[0] for item in shelf_layer]
+            self.result[self.inv_idx_dict[i]]['layer'] = [item[1] for item in shelf_layer]
+            self.result[self.inv_idx_dict[i]]['x'] = [self.x[i][j][k] for (j, k) in shelf_layer]
+            self.result[self.inv_idx_dict[i]]['y'] = [self.y[i][j][k] for (j, k) in shelf_layer]
+            self.result[self.inv_idx_dict[i]]['n'] = [self.n3d[i][j][k] for (j, k) in shelf_layer]
 
 class OneShelfDisplayOptimizer(object):
     """ to find the optimal way to display product to shelves

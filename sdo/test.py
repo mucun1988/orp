@@ -4,14 +4,17 @@ from sdo import ShelfDisplayOptimizer
 
 st = time.time()
 
-q = [10, 5, 4, 10]  # product quantities
-l = [2, 5, 1, 2]  # length of each product
-n = len(q)  # number of products to be displayed on shelf
+# input
+skus_info = {'skuA': {'q': 10, 'l':2},
+             'skuB': {'q': 5, 'l': 5},
+             'skuC': {'q': 4, 'l': 1},
+             'skuD': {'q': 10, 'l': 2}}
+
 m = 2   # number of shelves available
 nl = 5     # number of layers of each shelf
 L = 10    # length of each layer
 
-sdo = ShelfDisplayOptimizer(q,l,m,nl,L)
+sdo = ShelfDisplayOptimizer(skus_info, m, nl, L)
 
 sdo.optimize()
 
@@ -21,13 +24,12 @@ if sdo.optimal:
     print(f"  shelves to use: {[i for i in range(m) if sdo.B1d[i]>0]}")
     print(f"  time consumed to solve: {time.time()-st}")
     print("**********************************************")
-    for i in range(n):
-        print(f"sku {i}: ")
-        for j in range(m):
-            if sdo.B2d[i][j] > 0:
-                print(f"  shelf {j}: ")
-            for k in range(nl):
-                if sdo.B3d[i][j][k] > 0:
-                    print(f"    layer {k}: position={round(sdo.x[i][j][k],2)}-{round(sdo.y[i][j][k],2)}; quantity={sdo.n3d[i][j][k]}")
+    for id in skus_info.keys():
+        print(f"sku {id}: ")
+        result = sdo.result[id]
+        for i in range(len(result['n'])):
+            print(f" shelf {result['shelf'][i]}-layer {result['layer'][i]}:")
+            print(f"     position={round(result['x'][i], 2)}-{round(result['y'][i], 2)}; quantity={result['n'][i]}")
 else:
     print('failed!')
+
