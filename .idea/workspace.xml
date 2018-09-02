@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f0202892-da66-4860-902a-53bda535714c" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/sdo/demo_greedy.py" beforeDir="false" afterPath="$PROJECT_DIR$/sdo/demo_greedy.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sdo/sdo/sdo.py" beforeDir="false" afterPath="$PROJECT_DIR$/sdo/sdo/sdo.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sdo/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/sdo/test.py" afterDir="false" />
     </list>
@@ -13,23 +14,35 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.7923323">
+    <splitter split-orientation="horizontal" split-proportion="0.115015976">
       <split-first>
         <leaf>
-          <file leaf-file-name="test.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="test.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/sdo/test.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="228">
-                  <caret line="27" column="28" lean-forward="true" selection-start-line="27" selection-start-column="28" selection-end-line="27" selection-end-column="28" />
+                <state relative-caret-position="318">
+                  <caret line="35" lean-forward="true" selection-start-line="35" selection-end-line="35" />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="demo_greedy.py" pinned="false" current-in-tab="false">
+          <file leaf-file-name="demo_greedy.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/sdo/demo_greedy.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="170">
-                  <caret line="23" column="17" lean-forward="true" selection-start-line="23" selection-start-column="17" selection-end-line="23" selection-end-column="17" />
+                <state relative-caret-position="72">
+                  <caret line="13" column="18" lean-forward="true" selection-start-line="13" selection-start-column="18" selection-end-line="13" selection-end-column="18" />
+                  <folding>
+                    <element signature="e#0#19#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="debug_greedy.py" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/sdo/debug_greedy.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="750">
+                  <caret line="50" column="48" selection-start-line="50" selection-start-column="48" selection-end-line="50" selection-end-column="48" />
                   <folding>
                     <element signature="e#0#19#0" expanded="true" />
                   </folding>
@@ -44,8 +57,8 @@
           <file leaf-file-name="sdo.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/sdo/sdo/sdo.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1627">
-                  <caret line="142" column="62" selection-start-line="142" selection-start-column="62" selection-end-line="142" selection-end-column="62" />
+                <state relative-caret-position="120">
+                  <caret line="177" selection-start-line="177" selection-end-line="177" selection-end-column="61" />
                   <folding>
                     <element signature="e#0#42#0" expanded="true" />
                   </folding>
@@ -65,6 +78,9 @@
     </option>
   </component>
   <component name="FindInProjectRecents">
+    <findStrings>
+      <find>self.m</find>
+    </findStrings>
     <replaceStrings>
       <replace />
     </replaceStrings>
@@ -84,9 +100,10 @@
         <option value="$PROJECT_DIR$/gns/test.py" />
         <option value="$PROJECT_DIR$/gns/gns/gns.py" />
         <option value="$PROJECT_DIR$/sdo/sdo/__init__.py" />
+        <option value="$PROJECT_DIR$/sdo/test.py" />
+        <option value="$PROJECT_DIR$/sdo/debug_greedy.py" />
         <option value="$PROJECT_DIR$/sdo/demo_greedy.py" />
         <option value="$PROJECT_DIR$/sdo/sdo/sdo.py" />
-        <option value="$PROJECT_DIR$/sdo/test.py" />
       </list>
     </option>
   </component>
@@ -159,7 +176,43 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.demo_greedy">
+    <configuration name="demo_greedy" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="orp" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/sdo" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sdo/demo_greedy.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <configuration name="sdo" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="orp" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/sdo/sdo" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/sdo/sdo/sdo.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
     <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="orp" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -178,8 +231,15 @@
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
     </configuration>
+    <list>
+      <item itemvalue="Python.test" />
+      <item itemvalue="Python.demo_greedy" />
+      <item itemvalue="Python.sdo" />
+    </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.demo_greedy" />
+        <item itemvalue="Python.sdo" />
         <item itemvalue="Python.test" />
       </list>
     </recent_temporary>
@@ -199,7 +259,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="836" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.10443491" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -208,10 +267,10 @@
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32882273" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info active="true" anchor="bottom" id="Python Console" order="7" visible="true" weight="0.4533153" />
+      <window_info anchor="bottom" id="Python Console" order="7" weight="0.43707713" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="7" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.3991881" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -227,7 +286,14 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="2" />
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/sdo/sdo/sdo.py</url>
+          <line>174</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+      </breakpoints>
+      <option name="time" value="11" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
@@ -291,10 +357,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/sdo/test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="318">
+          <caret line="35" lean-forward="true" selection-start-line="35" selection-end-line="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sdo/debug_greedy.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="750">
+          <caret line="50" column="48" selection-start-line="50" selection-start-column="48" selection-end-line="50" selection-end-column="48" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/sdo/demo_greedy.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="23" column="17" lean-forward="true" selection-start-line="23" selection-start-column="17" selection-end-line="23" selection-end-column="17" />
+        <state relative-caret-position="72">
+          <caret line="13" column="18" lean-forward="true" selection-start-line="13" selection-start-column="18" selection-end-line="13" selection-end-column="18" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>
@@ -303,18 +386,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/sdo/sdo/sdo.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1627">
-          <caret line="142" column="62" selection-start-line="142" selection-start-column="62" selection-end-line="142" selection-end-column="62" />
+        <state relative-caret-position="120">
+          <caret line="177" selection-start-line="177" selection-end-line="177" selection-end-column="61" />
           <folding>
             <element signature="e#0#42#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sdo/test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="228">
-          <caret line="27" column="28" lean-forward="true" selection-start-line="27" selection-start-column="28" selection-end-line="27" selection-end-column="28" />
         </state>
       </provider>
     </entry>

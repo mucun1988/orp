@@ -16,7 +16,7 @@ L = 10    # length of each layer
 
 sdo = ShelfDisplayOptimizer(skus_info, m, nl, L)
 
-sdo.optimize()
+sdo.optimize_global()
 
 if sdo.optimal:
     print("**********************************************")

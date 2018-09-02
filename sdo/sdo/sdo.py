@@ -1,5 +1,9 @@
 from ortools.linear_solver import pywraplp
-import warnings
+import warnings, sys, os
+from os.path import dirname, join
+
+sys.path.extend([join(dirname(dirname(dirname(__file__))), 'mbp')])
+from mbp import OneBagPacker
 
 class ShelfDisplayOptimizer(object):
     """ to find the optimal way to display product on shelves (a global MIO approach)
@@ -34,8 +38,8 @@ class ShelfDisplayOptimizer(object):
         if time_limit > 0:
             self.solver.set_time_limit(time_limit)
 
-    def optimize(self):
-
+    def optimize_global(self):
+        assert self.m > 0
         q,l,n,m,nl,L, solver \
             = self.q, self.l, self.n, self.m, self.nl, self.L, self.solver
 
@@ -131,9 +135,9 @@ class ShelfDisplayOptimizer(object):
         self.B1d = _sol_val(B1d)
         self.B2d = _sol_val(B2d)
         self.B3d = _sol_val(B3d)
-        self._post_process()
+        self._post_process_global()
 
-    def _post_process(self):
+    def _post_process_global(self):
         for i in range(self.n):
             shelf_layer = [(j, k) for j in range(self.m) for k in range(self.nl) if self.B3d[i][j][k] == 1]
             self.result[self.inv_idx_dict[i]]['shelf'] = [item[0] for item in shelf_layer]
@@ -141,6 +145,66 @@ class ShelfDisplayOptimizer(object):
             self.result[self.inv_idx_dict[i]]['x'] = [self.x[i][j][k] for (j, k) in shelf_layer]
             self.result[self.inv_idx_dict[i]]['y'] = [self.y[i][j][k] for (j, k) in shelf_layer]
             self.result[self.inv_idx_dict[i]]['n'] = [self.n3d[i][j][k] for (j, k) in shelf_layer]
+
+
+    def optimize_greedy(self):
+
+        q,l,n,m,nl,L \
+            = self.q, self.l, self.n, self.m, self.nl, self.L
+
+        idx_left = list(range(len(q)))
+
+        shelf = 0
+
+        while len(idx_left) > 0 and shelf < m:
+
+            # select s to be displayed
+            w = [q[i] * l[i] for i in idx_left]
+            obp = OneBagPacker(weights=w, capacity=L * nl, dg=1000)
+            obp.pack()
+            s = [idx_left[i] for i in obp.packed_items]  # global index
+
+            # optimize display using products in s
+            q_s = [q[i] for i in s]
+            l_s = [l[i] for i in s]
+
+            osdo = OneShelfDisplayOptimizer(q_s, l_s, nl, L, time_limit=-1)
+
+            osdo.optimize()
+
+            assert osdo.optimal
+
+            idx_put = [s[i] for i in range(len(s)) if osdo.B1d[i] > 0] # global index
+            ids_put = [self.inv_idx_dict[i] for i in idx_put]
+
+            for i in range(len(s)): # i is local
+                if osdo.B1d[i] > 0:
+                    shelf_list = []
+                    layer_list = []
+                    x_list = []
+                    y_list = []
+                    n_list = []
+                    for k in range(nl):
+                        if osdo.B2d[i][k] > 0:
+                            shelf_list.append(shelf)
+                            layer_list.append(k)
+                            x_list.append(osdo.x[i][k])
+                            y_list.append(osdo.y[i][k])
+                            n_list.append(osdo.n2d[i][k])
+
+                    self.result[self.inv_idx_dict[s[i]]]['shelf'] = shelf_list
+                    self.result[self.inv_idx_dict[s[i]]]['layer'] = layer_list
+                    self.result[self.inv_idx_dict[s[i]]]['x'] = x_list
+                    self.result[self.inv_idx_dict[s[i]]]['y'] = y_list
+                    self.result[self.inv_idx_dict[s[i]]]['n'] = n_list
+
+
+            del osdo
+            idx_left = [x for x in idx_left if x not in idx_put]
+            shelf += 1
+
+        # TODO: put small/easy stuff afterwards
+
 
 class OneShelfDisplayOptimizer(object):
     """ to find the optimal way to display product to shelves
@@ -273,4 +337,3 @@ def _sol_val(x):
 def _obj_val(x):
   return x.Objective().Value()
 
-# TODO: inteprete the output
