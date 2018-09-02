@@ -11,7 +11,6 @@ from ortools.linear_solver import pywraplp
 import warnings
 
 
-
 class GNS(object):
     
     def __init__(self, values, weights, capacity, style='hard'):
