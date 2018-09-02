@@ -217,7 +217,8 @@ class OneShelfDisplayOptimizer(object):
         # objective
         solver.Maximize(sum([l_s[i] * n2d[i][k] for i in range(n) for k in range(nl)]) + \
                    .1 * sum([o[i][k] for i in range(n) for k in range(nl)]) + \
-                   sum([10**(-2+k)*l_s[i]*n2d[i][k] for i in range(n) for k in range(nl)]))
+                   sum([10**(-3-k)*l_s[i]*n2d[i][k] for i in range(n) for k in range(nl)]) + \
+                   - .01*sum([x[i][k] for i in range(n) for k in range(nl)]))
 
         result_status = solver.Solve()
 
