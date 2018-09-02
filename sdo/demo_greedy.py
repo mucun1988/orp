@@ -23,7 +23,7 @@ dat['ITEM_WIDTH_QTY'] = dat['ITEM_WIDTH_QTY'].apply(lambda x: round(x,3))
 dat['TOT_FACE_QTY_UB'] = dat['ITEM_WIDTH_QTY'].apply(lambda x: int(np.floor(L/x))*nl)
 dat['TOT_FACE_QTY_T'] = dat[['TOT_FACE_QTY', 'TOT_FACE_QTY_UB']].min(axis=1)
 
-dat = dat[(dat.TOT_FACE_QTY_T > 1) & (dat.ITEM_WIDTH_QTY > 0)]
+dat = dat[(dat.TOT_FACE_QTY_T > 2) & (dat.ITEM_WIDTH_QTY > 0)]
 
 skus = dat.OLD_NBR.tolist()
 q = dat.TOT_FACE_QTY_T.tolist()

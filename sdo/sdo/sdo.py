@@ -2,7 +2,7 @@ from ortools.linear_solver import pywraplp
 import warnings
 
 class ShelfDisplayOptimizer(object):
-    """ to find the optimal way to display product to shelves
+    """ to find the optimal way to display product on shelves (a global MIO approach)
     Attributes:
         q (list): product quantities
         l (list): product lengths
@@ -103,10 +103,11 @@ class ShelfDisplayOptimizer(object):
                     solver.Add(y[i][j][k] - x[i][j][k] == l[i] * n3d[i][j][k])
                     solver.Add(o[i][j][k] == t[i][j][k] - h[i][j][k]) # overlapping area
                     solver.Add(o[i][j][k] >= l[i] * B3d[i][j][k])     # must be connected
-                    solver.Add(y[i][j][k] <= L * B3d[i][j][k])        #
-                    solver.Add(t[i][j][k] <= L * B3d[i][j][k])
+                    solver.Add(y[i][j][k] <= L * B3d[i][j][k])
+                    solver.Add(t[i][j][k] <= y[i][j][k])
+                    solver.Add(h[i][j][k] <= t[i][j][k])
+                    solver.Add(x[i][j][k] <= h[i][j][k])
                     solver.Add(B3d[i][j][k] <= B2d[i][j])
-
 
         for i in range(n):
             for j in range(m):
@@ -162,7 +163,9 @@ class OneShelfDisplayOptimizer(object):
         # define variables
         B1d = [solver.IntVar(0, 1, f'B_{i}') for i in range(n)]
         B2d = [[solver.IntVar(0, 1, f'B_{i}_{j}') for j in range(nl)] for i in range(n)]
+        IX2d = [[solver.IntVar(0, 1, f'IX_{i}_{k}') for k in range(nl)] for i in range(n)]
         Left = [[[solver.IntVar(0, 1, f'L_{i}_{ip}_{k}') for k in range(nl)] for ip in range(n)] for i in range(n)]
+
         n2d = [[solver.IntVar(0, q_s[i], f'n_{i}_{k}') for k in range(nl)] for i in range(n)]
 
         x = [[solver.NumVar(0.0, L, f'x_{i}_{k}') for k in range(nl)] for i in range(n)]
@@ -172,9 +175,12 @@ class OneShelfDisplayOptimizer(object):
         o = [[solver.NumVar(0.0, L, f'o_{i}_{k}') for k in range(nl)] for i in range(n)]
 
         # constraints
+
+        # quantity
         for i in range(n):
             solver.Add(sum([n2d[i][k] for k in range(nl)]) == q_s[i] * B1d[i])
 
+        # no collisions
         for i in range(n):
             for ip in range(n):
                 for k in range(nl):
@@ -186,6 +192,7 @@ class OneShelfDisplayOptimizer(object):
                 for k in range(nl):
                     solver.Add(y[i][k] + Left[i][ip][k] * L <= x[ip][k] + L)
 
+        # connected
         for i in range(n):
             for k1 in range(nl):
                 for k2 in range(nl):
@@ -193,6 +200,7 @@ class OneShelfDisplayOptimizer(object):
                         if k1 < k2 and k2 < k3:
                             solver.Add(B2d[i][k1] - B2d[i][k2] + B2d[i][k3] <= 1)
 
+        # overlapping length (o)
         for i in range(n):
             for k in range(nl):
                 for kp in range(nl):
@@ -207,18 +215,21 @@ class OneShelfDisplayOptimizer(object):
             for k in range(nl):
                 solver.Add(y[i][k] - x[i][k] == l_s[i] * n2d[i][k])
                 solver.Add(o[i][k] == t[i][k] - h[i][k])
-                solver.Add(o[i][k] >= l_s[i] * B2d[i][k])  # must be connected
+                # solver.Add(o[i][k] >= l_s[i] * B2d[i][k]) # must be connected
                 solver.Add(y[i][k] <= L * B2d[i][k])
-                solver.Add(t[i][k] <= L * B2d[i][k])
-                solver.Add(B2d[i][k] <= B1d[i])
                 solver.Add(y[i][k] >= t[i][k])
                 solver.Add(t[i][k] >= h[i][k])
                 solver.Add(h[i][k] >= x[i][k])
+                solver.Add(x[i][k] <= L * IX2d[i][k])
+                solver.Add(B2d[i][k] <= B1d[i])
+
         # objective
         solver.Maximize(sum([l_s[i] * n2d[i][k] for i in range(n) for k in range(nl)]) + \
                    .1 * sum([o[i][k] for i in range(n) for k in range(nl)]) + \
-                   sum([10**(-3-k)*l_s[i]*n2d[i][k] for i in range(n) for k in range(nl)]) + \
-                   - .01*sum([x[i][k] for i in range(n) for k in range(nl)]))
+                   # sum([10**(-3-k)*l_s[i]*n2d[i][k] for i in range(n) for k in range(nl)]) + \
+                   -.01*sum([IX2d[i][k] for i in range(n) for k in range(nl)]) + \
+                   -.0001*sum([y[i][k]/L for i in range(n) for k in range(nl)]))
+
 
         result_status = solver.Solve()
 
@@ -248,3 +259,5 @@ def _sol_val(x):
 
 def _obj_val(x):
   return x.Objective().Value()
+
+# TODO: inteprete the output
