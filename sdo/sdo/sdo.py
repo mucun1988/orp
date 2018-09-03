@@ -128,6 +128,7 @@ class ShelfDisplayOptimizer(object):
 
         result_status=solver.Solve()
 
+
         self.optimal= (result_status == pywraplp.Solver.OPTIMAL)
         self.x = _sol_val(x)
         self.y = _sol_val(y)
@@ -135,7 +136,10 @@ class ShelfDisplayOptimizer(object):
         self.B1d = _sol_val(B1d)
         self.B2d = _sol_val(B2d)
         self.B3d = _sol_val(B3d)
+        self.num_of_shelf = m
         self._post_process_global()
+        self._output_layout()
+
 
     def _post_process_global(self):
         for i in range(self.n):
@@ -146,6 +150,36 @@ class ShelfDisplayOptimizer(object):
             self.result[self.inv_idx_dict[i]]['y'] = [self.y[i][j][k] for (j, k) in shelf_layer]
             self.result[self.inv_idx_dict[i]]['n'] = [self.n3d[i][j][k] for (j, k) in shelf_layer]
 
+    def _output_layout(self):
+        results = self.result
+        display_result = [[{'skus': [], 'x': [], 'y': [], 'n': []} for j in range(self.nl)]
+                                                                        for i in range(self.num_of_shelf)]
+
+        for sku_id in results.keys():
+            result = results[sku_id]
+            shelf = result['shelf']
+            layer = result['layer']
+            x = result['x']
+            y = result['y']
+            n = result['n']
+            for i in range(len(result['shelf'])):
+                display_result[shelf[i]][layer[i]]['skus'].append(sku_id)
+                display_result[shelf[i]][layer[i]]['x'].append(x[i])
+                display_result[shelf[i]][layer[i]]['y'].append(y[i])
+                display_result[shelf[i]][layer[i]]['n'].append(n[i])
+
+        for i in range(self.num_of_shelf):
+            for j in range(self.nl):
+                s = display_result[i][j]['x']
+                if len(s) > 1:
+                    idx = sorted(range(len(s)), key=lambda k: s[k])
+                    display_result[i][j]['skus'] = list(map(lambda _: display_result[i][j]['skus'][_], idx))
+                    display_result[i][j]['x'] = list(map(lambda _: display_result[i][j]['x'][_], idx))
+                    display_result[i][j]['y'] = list(map(lambda _: display_result[i][j]['y'][_], idx))
+                    display_result[i][j]['n'] = list(map(lambda _: display_result[i][j]['n'][_], idx))
+
+        self.layout = display_result
+
 
     def optimize_greedy(self):
 
@@ -155,67 +189,96 @@ class ShelfDisplayOptimizer(object):
         idx_left = list(range(len(q)))
 
         shelf = 0
+        q_left = [q[i] for i in idx_left]
 
         while len(idx_left) > 0 and shelf < m:
 
-            # select s to be displayed
-            w = [q[i] * l[i] for i in idx_left]
-            obp = OneBagPacker(weights=w, capacity=L * nl, dg=1000)
-            obp.pack()
-            s1 = [idx_left[i] for i in obp.packed_items]  # global index
+            print(f"Optimizing shelf {shelf}...")
 
-            obp = OneBagPackerOpp(weights=w, capacity=L, dg=1000)
-            obp.pack()
-            s2 = [idx_left[i] for i in obp.packed_items]
+            if len([_ for _ in q_left if _ > 1]) > 0:
+                # select s to be displayed
+                w = [q[i] * l[i] for i in idx_left]
+                obp = OneBagPacker(weights=w, capacity=L * (nl+1), dg=1000)
+                obp.pack()
+                s1 = [idx_left[i] for i in obp.packed_items]  # global index
 
-            s1.extend(s2)
+                obp = OneBagPackerOpp(weights=w, capacity=L * 2, dg=1000)
+                obp.pack()
+                s2 = [idx_left[i] for i in obp.packed_items]
 
-            s = list(set(s1))
+                s1.extend(s2)
 
-            # optimize display using products in s
-            q_s = [q[i] for i in s]
-            l_s = [l[i] for i in s]
+                s = list(set(s1))
 
-            osdo = OneShelfDisplayOptimizer(q_s, l_s, nl, L, time_limit=self.time_limit)
+                # optimize display using products in s
+                q_s = [q[i] for i in s]
+                l_s = [l[i] for i in s]
 
-            osdo.optimize()
+                osdo = OneShelfDisplayOptimizer(q_s, l_s, nl, L, time_limit=self.time_limit)
 
-            assert osdo.feasible or osdo.optimal
+                osdo.optimize()
 
-            if osdo.feasible:
-                warnings.warn("Feasible but perhaps suboptimal!")
+                assert osdo.feasible or osdo.optimal
 
-
-            idx_put = [s[i] for i in range(len(s)) if osdo.B1d[i] > 0] # global index
-            ids_put = [self.inv_idx_dict[i] for i in idx_put]
-
-            for i in range(len(s)): # i is local
-                if osdo.B1d[i] > 0:
-                    shelf_list = []
-                    layer_list = []
-                    x_list = []
-                    y_list = []
-                    n_list = []
-                    for k in range(nl):
-                        if osdo.B2d[i][k] > 0:
-                            shelf_list.append(shelf)
-                            layer_list.append(k)
-                            x_list.append(osdo.x[i][k])
-                            y_list.append(osdo.y[i][k])
-                            n_list.append(osdo.n2d[i][k])
-
-                    self.result[self.inv_idx_dict[s[i]]]['shelf'] = shelf_list
-                    self.result[self.inv_idx_dict[s[i]]]['layer'] = layer_list
-                    self.result[self.inv_idx_dict[s[i]]]['x'] = x_list
-                    self.result[self.inv_idx_dict[s[i]]]['y'] = y_list
-                    self.result[self.inv_idx_dict[s[i]]]['n'] = n_list
+                if osdo.feasible:
+                    warnings.warn("Feasible but perhaps suboptimal!")
 
 
-            del osdo
-            idx_left = [x for x in idx_left if x not in idx_put]
-            shelf += 1
+                idx_put = [s[i] for i in range(len(s)) if osdo.B1d[i] > 0] # global index
+                ids_put = [self.inv_idx_dict[i] for i in idx_put]
 
-        # TODO: put small/easy stuff afterwards
+                for i in range(len(s)): # i is local
+                    if osdo.B1d[i] > 0:
+                        shelf_list = []
+                        layer_list = []
+                        x_list = []
+                        y_list = []
+                        n_list = []
+                        for k in range(nl):
+                            if osdo.B2d[i][k] > 0:
+                                shelf_list.append(shelf)
+                                layer_list.append(k)
+                                x_list.append(osdo.x[i][k])
+                                y_list.append(osdo.y[i][k])
+                                n_list.append(osdo.n2d[i][k])
+
+                        self.result[self.inv_idx_dict[s[i]]]['shelf'] = shelf_list
+                        self.result[self.inv_idx_dict[s[i]]]['layer'] = layer_list
+                        self.result[self.inv_idx_dict[s[i]]]['x'] = x_list
+                        self.result[self.inv_idx_dict[s[i]]]['y'] = y_list
+                        self.result[self.inv_idx_dict[s[i]]]['n'] = n_list
+
+
+                del osdo
+                idx_left = [x for x in idx_left if x not in idx_put]
+                q_left = [q[i] for i in idx_left]
+                shelf += 1
+
+            else: # all q left is 1
+                for layer in range(nl):
+                    w = [q[i] * l[i] for i in idx_left]
+                    obp = OneBagPacker(weights=w, capacity=L, dg=1000)
+                    obp.pack()
+                    s = [idx_left[i] for i in obp.packed_items]  # global index
+                    x_ = 0
+                    for idx in s:
+                        self.result[self.inv_idx_dict[idx]]['shelf'] = [shelf]
+                        self.result[self.inv_idx_dict[idx]]['layer'] = [layer]
+                        self.result[self.inv_idx_dict[idx]]['x'] = [x_]
+                        self.result[self.inv_idx_dict[idx]]['y'] = [x_ + self.result[self.inv_idx_dict[idx]]['l']]
+                        self.result[self.inv_idx_dict[idx]]['n'] = [1]
+                        x_ += self.result[self.inv_idx_dict[idx]]['l']
+                    idx_left = [_ for _ in idx_left if _ not in s]
+                    q_left = [q[i] for i in idx_left]
+                    if len(idx_left) < 1:
+                        break
+                shelf += 1
+
+        self.num_of_shelf = shelf
+        self._output_layout()
+
+
+        # TODO: analyze the final output
 
 
 class OneShelfDisplayOptimizer(object):
@@ -350,3 +413,4 @@ def _sol_val(x):
 def _obj_val(x):
   return x.Objective().Value()
 
+# TODO: how to handle 2 and 3

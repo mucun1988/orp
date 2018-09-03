@@ -7,14 +7,7 @@ Created on Sat Aug 11 15:29:47 2018
 """
 
 import numpy as np
-import pandas as pd
-import json
-import requests
-from PIL import Image
-from io import BytesIO
-from sklearn.cluster import KMeans
-#import logging
-import sys
+
 
 from ortools.algorithms import pywrapknapsack_solver
 
