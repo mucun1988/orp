@@ -67,7 +67,23 @@ class OneBagPacker(object):
         self.weights = weights
         self.capacity = capacity
         self.dg = dg
-        self.values = [ (1+w/(w+1))*w for w in self.weights] # key
+        self.values = [(1+w/(w+1))*w for w in self.weights] # key
+
+    def pack(self):
+        knapsack = Knapsack(self.values, self.weights, self.capacity, self.dg)
+        knapsack.solve()
+        self.packed_items = knapsack.packed_items
+        self.bag_weight = knapsack.bag_weight
+
+
+class OneBagPackerOpp(object):
+    """pack one bag"""
+
+    def __init__(self, weights, capacity, dg=100):
+        self.weights = weights
+        self.capacity = capacity
+        self.dg = dg
+        self.values = [1 for w in self.weights]  # key
 
     def pack(self):
         knapsack = Knapsack(self.values, self.weights, self.capacity, self.dg)

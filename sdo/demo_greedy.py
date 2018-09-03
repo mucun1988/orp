@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import time
 import os, sys
 
 sys.path.extend([os.path.join('.', 'sdo')])
@@ -32,6 +31,6 @@ assert len(q)==len(l)==len(skus)
 
 skus_info = dict({str(skus[i]):{'q': q[i],'l': l[i]} for i in range(len(skus))})
 
-sdo = ShelfDisplayOptimizer(skus_info,  m, nl, L)
+sdo = ShelfDisplayOptimizer(skus_info,  m, nl, L, time_limit=1000*60*10)
 sdo.optimize_greedy()
 

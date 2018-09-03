@@ -3,7 +3,7 @@ import warnings, sys, os
 from os.path import dirname, join
 
 sys.path.extend([join(dirname(dirname(dirname(__file__))), 'mbp')])
-from mbp import OneBagPacker
+from mbp import OneBagPacker, OneBagPackerOpp
 
 class ShelfDisplayOptimizer(object):
     """ to find the optimal way to display product on shelves (a global MIO approach)
@@ -162,17 +162,29 @@ class ShelfDisplayOptimizer(object):
             w = [q[i] * l[i] for i in idx_left]
             obp = OneBagPacker(weights=w, capacity=L * nl, dg=1000)
             obp.pack()
-            s = [idx_left[i] for i in obp.packed_items]  # global index
+            s1 = [idx_left[i] for i in obp.packed_items]  # global index
+
+            obp = OneBagPackerOpp(weights=w, capacity=L, dg=1000)
+            obp.pack()
+            s2 = [idx_left[i] for i in obp.packed_items]
+
+            s1.extend(s2)
+
+            s = list(set(s1))
 
             # optimize display using products in s
             q_s = [q[i] for i in s]
             l_s = [l[i] for i in s]
 
-            osdo = OneShelfDisplayOptimizer(q_s, l_s, nl, L, time_limit=-1)
+            osdo = OneShelfDisplayOptimizer(q_s, l_s, nl, L, time_limit=self.time_limit)
 
             osdo.optimize()
 
-            assert osdo.optimal
+            assert osdo.feasible or osdo.optimal
+
+            if osdo.feasible:
+                warnings.warn("Feasible but perhaps suboptimal!")
+
 
             idx_put = [s[i] for i in range(len(s)) if osdo.B1d[i] > 0] # global index
             ids_put = [self.inv_idx_dict[i] for i in idx_put]
@@ -311,6 +323,7 @@ class OneShelfDisplayOptimizer(object):
         result_status = solver.Solve()
 
         self.optimal = (result_status == pywraplp.Solver.OPTIMAL)
+        self.feasible = (result_status == pywraplp.Solver.FEASIBLE)
         self.x = _sol_val(x)
         self.y = _sol_val(y)
         self.n2d = _sol_val(n2d)
