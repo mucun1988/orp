@@ -15,7 +15,7 @@ except:
 
 L = 45*12/15 #foot
 nl = 5
-m = 200
+m = 20
 
 dat['ITEM_WIDTH_QTY'] = dat['ITEM_WIDTH_QTY'].apply(lambda x: round(x,3))
 dat['TOT_FACE_QTY_UB'] = dat['ITEM_WIDTH_QTY'].apply(lambda x: int(np.floor(L/x))*nl)

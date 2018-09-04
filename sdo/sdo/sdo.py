@@ -1,22 +1,21 @@
 from ortools.linear_solver import pywraplp
-import warnings, sys, os
+import warnings, sys, os, time, copy
 from os.path import dirname, join
 
 sys.path.extend([join(dirname(dirname(dirname(__file__))), 'mbp')])
-from mbp import OneBagPacker, OneBagPackerOpp
+from mbp import OneBagPacker
 
 class ShelfDisplayOptimizer(object):
     """ to find the optimal way to display product on shelves (a global MIO approach)
     Attributes:
-        q (list): product quantities
-        l (list): product lengths
+        skus_info (dict): skus information (quantity, length)
         m (int): number of shelves to be used
         nl (int): number of layers per shelf can be used
         L (float): length of each layer
         solver (obj): an instance of pywraplp.Solver (our core optimization engine)
     """
     def __init__(self, skus_info, m, nl, L, time_limit=-1):
-        self.skus_info = skus_info.copy()
+        self.skus_info = copy.deepcopy(skus_info)
         self.sku_ids = list(skus_info.keys())
         self.n = len(self.sku_ids)  # number of products to be displayed on shelf
         self.idx_dict = dict(zip(self.sku_ids, range(self.n)))
@@ -26,7 +25,7 @@ class ShelfDisplayOptimizer(object):
         self.m = m
         self.nl = nl
         self.L = L
-        self.result = skus_info.copy()
+        self.result = copy.deepcopy(skus_info)
         self.time_limit=time_limit
 
         try:
@@ -157,17 +156,19 @@ class ShelfDisplayOptimizer(object):
 
         for sku_id in results.keys():
             result = results[sku_id]
-            shelf = result['shelf']
-            layer = result['layer']
-            x = result['x']
-            y = result['y']
-            n = result['n']
-            for i in range(len(result['shelf'])):
-                display_result[shelf[i]][layer[i]]['skus'].append(sku_id)
-                display_result[shelf[i]][layer[i]]['x'].append(x[i])
-                display_result[shelf[i]][layer[i]]['y'].append(y[i])
-                display_result[shelf[i]][layer[i]]['n'].append(n[i])
+            if 'shelf' in result.keys(): # skus allocated
+                shelf = result['shelf']
+                layer = result['layer']
+                x = result['x']
+                y = result['y']
+                n = result['n']
+                for i in range(len(result['shelf'])):
+                    display_result[shelf[i]][layer[i]]['skus'].append(sku_id)
+                    display_result[shelf[i]][layer[i]]['x'].append(x[i])
+                    display_result[shelf[i]][layer[i]]['y'].append(y[i])
+                    display_result[shelf[i]][layer[i]]['n'].append(n[i])
 
+        # sorting
         for i in range(self.num_of_shelf):
             for j in range(self.nl):
                 s = display_result[i][j]['x']
@@ -178,7 +179,19 @@ class ShelfDisplayOptimizer(object):
                     display_result[i][j]['y'] = list(map(lambda _: display_result[i][j]['y'][_], idx))
                     display_result[i][j]['n'] = list(map(lambda _: display_result[i][j]['n'][_], idx))
 
+        shelf_utilization = [[[] for j in range(self.nl)] for i in range(self.num_of_shelf)]
+
+        for i in range(self.num_of_shelf):
+            for j in range(self.nl):
+                x = display_result[i][j]['x']
+                y = display_result[i][j]['y']
+                if len(x) == 0:
+                    shelf_utilization[i][j] = None
+                else:
+                    shelf_utilization[i][j] = sum([y[i]-x[i] for i in range(len(x))])/self.L
+
         self.layout = display_result
+        self.shelf_utilization = shelf_utilization
 
 
     def optimize_greedy(self):
@@ -195,20 +208,32 @@ class ShelfDisplayOptimizer(object):
 
             print(f"Optimizing shelf {shelf}...")
 
+            st = time.time()
+
             if len([_ for _ in q_left if _ > 1]) > 0:
+
+                # approach 1
+                # # select s to be displayed
+                # w = [q[i] * l[i] for i in idx_left]
+                # obp = OneBagPacker(weights=w, capacity=L * (nl+1), dg=1000)
+                # obp.pack()
+                # s1 = [idx_left[i] for i in obp.packed_items]  # global index
+                #
+                # obp = OneBagPackerOpp(weights=w, capacity=L * 2, dg=1000)
+                # obp.pack()
+                # s2 = [idx_left[i] for i in obp.packed_items]
+                #
+                # s1.extend(s2)
+                #
+                # s = list(set(s1))
                 # select s to be displayed
+
+                # approach 2
                 w = [q[i] * l[i] for i in idx_left]
-                obp = OneBagPacker(weights=w, capacity=L * (nl+1), dg=1000)
+                obp = OneBagPacker(weights=w, capacity=L * nl, dg=1000)
                 obp.pack()
-                s1 = [idx_left[i] for i in obp.packed_items]  # global index
+                s = [idx_left[i] for i in obp.packed_items]  # global index
 
-                obp = OneBagPackerOpp(weights=w, capacity=L * 2, dg=1000)
-                obp.pack()
-                s2 = [idx_left[i] for i in obp.packed_items]
-
-                s1.extend(s2)
-
-                s = list(set(s1))
 
                 # optimize display using products in s
                 q_s = [q[i] for i in s]
@@ -227,6 +252,9 @@ class ShelfDisplayOptimizer(object):
                 idx_put = [s[i] for i in range(len(s)) if osdo.B1d[i] > 0] # global index
                 ids_put = [self.inv_idx_dict[i] for i in idx_put]
 
+                x_layer = [[] for i in range(nl)]
+                y_layer = [[] for i in range(nl)]
+
                 for i in range(len(s)): # i is local
                     if osdo.B1d[i] > 0:
                         shelf_list = []
@@ -241,6 +269,8 @@ class ShelfDisplayOptimizer(object):
                                 x_list.append(osdo.x[i][k])
                                 y_list.append(osdo.y[i][k])
                                 n_list.append(osdo.n2d[i][k])
+                                x_layer[k].append(osdo.x[i][k])
+                                y_layer[k].append(osdo.y[i][k])
 
                         self.result[self.inv_idx_dict[s[i]]]['shelf'] = shelf_list
                         self.result[self.inv_idx_dict[s[i]]]['layer'] = layer_list
@@ -248,13 +278,34 @@ class ShelfDisplayOptimizer(object):
                         self.result[self.inv_idx_dict[s[i]]]['y'] = y_list
                         self.result[self.inv_idx_dict[s[i]]]['n'] = n_list
 
-
                 del osdo
                 idx_left = [x for x in idx_left if x not in idx_put]
                 q_left = [q[i] for i in idx_left]
-                shelf += 1
 
-            else: # all q left is 1
+                # put in small stuff
+                for i in range(nl):
+                    if len(idx_left) > 0:
+                        empty_space_list = _find_space(x_layer[i], y_layer[i], self.L)
+                        for j in range(len(empty_space_list)):
+                            x,y = empty_space_list[j]
+                            w = [q[i] * l[i] for i in idx_left]
+                            obp = OneBagPacker(weights=w, capacity=y-x, dg=1000)
+                            obp.pack()
+                            s = [idx_left[i] for i in obp.packed_items]  # global index
+                            #print(s)
+                            for idx in s:
+                                self.result[self.inv_idx_dict[idx]]['shelf'] = [shelf]
+                                self.result[self.inv_idx_dict[idx]]['layer'] = [i]
+                                self.result[self.inv_idx_dict[idx]]['x'] = [x]
+                                self.result[self.inv_idx_dict[idx]]['y'] = [x + self.result[self.inv_idx_dict[idx]]['l']]
+                                self.result[self.inv_idx_dict[idx]]['n'] = [self.result[self.inv_idx_dict[idx]]['q']]
+                                x += self.result[self.inv_idx_dict[idx]]['l']
+                            idx_left = [_ for _ in idx_left if _ not in s]
+                            #print(idx_left)
+
+
+            else:
+                # all q left is 1, then simple handle layer by layer
                 for layer in range(nl):
                     w = [q[i] * l[i] for i in idx_left]
                     obp = OneBagPacker(weights=w, capacity=L, dg=1000)
@@ -272,7 +323,12 @@ class ShelfDisplayOptimizer(object):
                     q_left = [q[i] for i in idx_left]
                     if len(idx_left) < 1:
                         break
-                shelf += 1
+
+            # after finishing this shelf
+            print(f"Optimizing shelf {shelf}...done ({round(time.time()-st,2)} sec).")
+            shelf += 1
+
+
 
         self.num_of_shelf = shelf
         self._output_layout()
@@ -413,4 +469,29 @@ def _sol_val(x):
 def _obj_val(x):
   return x.Objective().Value()
 
-# TODO: how to handle 2 and 3
+def _find_space(x,y, L, nd=2):
+
+    assert len(x) == len(y)
+
+    if len(x) == 0:
+        return [[0, L]]
+
+    x = x.copy()
+    y = y.copy()
+
+    # sorted first
+    idx = sorted(range(len(x)), key=lambda k: x[k])
+    x = list(map(lambda _: x[_], idx))
+    y = list(map(lambda _: y[_], idx))
+
+    x = x + [L]
+    y = [0] + y
+
+    result = []
+
+    for i in range(len(x)):
+        if round(y[i], nd) < round(x[i], nd):
+            result.append([y[i], x[i]])
+
+    return result
+
