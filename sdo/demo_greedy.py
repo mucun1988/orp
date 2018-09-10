@@ -13,9 +13,9 @@ except:
     dat_file = '/datadrive/matthew/dat/StoreDataSetV4.txt'
     dat = pd.read_csv(dat_file, sep='\t')
 
-L = 45*12/15 #foot
+L = 4*12 #foot
 nl = 5
-m = 20
+m = 5
 
 dat['ITEM_WIDTH_QTY'] = dat['ITEM_WIDTH_QTY'].apply(lambda x: round(x,3))
 dat['TOT_FACE_QTY_UB'] = dat['ITEM_WIDTH_QTY'].apply(lambda x: int(np.floor(L/x))*nl)
@@ -32,13 +32,5 @@ assert len(q)==len(l)==len(skus)
 skus_info = dict({str(skus[i]):{'q': q[i],'l': l[i]} for i in range(len(skus))})
 
 sdo = ShelfDisplayOptimizer(skus_info,  m, nl, L, time_limit=1000*60*10)
-sdo.optimize_greedy()
-
-
-
-
-
-
-
-
+sdo.optimize_greedy(3)
 

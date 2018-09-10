@@ -83,7 +83,7 @@ V = [[24, 40, 79],
      [23, 48]]
 capacity = 37
 
-gns = GNS(V,W,capacity, 'hard')
+gns = GNS(V,W,capacity, 'soft')
 
 gns.solve()
 
