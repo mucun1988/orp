@@ -2,6 +2,7 @@ from ortools.linear_solver import pywraplp
 import warnings, sys, os, time, copy
 from os.path import dirname, join
 from PIL import Image, ImageDraw, ImageChops #to plot
+import numpy as np
 
 sys.path.extend([join(dirname(dirname(dirname(__file__))), 'mbp')])
 from mbp import OneBagPacker
@@ -46,6 +47,7 @@ class ShelfDisplayOptimizer(object):
         if time_limit > 0:
             self.solver.set_time_limit(time_limit)
 
+    # a depreciate method
     def optimize_global(self):
         """
         solve the problem using global MIO approach
@@ -205,11 +207,11 @@ class ShelfDisplayOptimizer(object):
         self.layout = display_result
         self.shelf_utilization = shelf_utilization
 
-    def plot_shelf_display(self, shelf, image_folder='/Users/matthew.mu/dat/images', save_file=None):
+    def plot_layout_one_shelf(self, shelf, image_folder='/Users/matthew.mu/dat/images', save_file=None):
 
         assert shelf < self.num_of_shelf
 
-        im = _plot_result(self.layout[shelf], image_folder=image_folder)
+        im = _plot_one_shelf(self.layout[shelf], image_folder=image_folder)
 
         if save_file == None:
             im.save('./sdo/fig/shelf_'+str(shelf)+'.jpg', 'JPEG')
@@ -218,12 +220,14 @@ class ShelfDisplayOptimizer(object):
 
         return im
 
-    def plot_layout_into_one(self, num_row):
+    def plot_layout_all_shelves(self, num_row):
         return _plot_all_results(self.layout, num_row=num_row)
 
     def optimize_greedy(self, threshold=1):
         """
         solve the problem shelf by shelf using MIO
+        :param threshold: SKUs with q>=threshold needs to be solved by MIO
+        :return: ...
         """
 
         q,l,n,m,nl,L \
@@ -529,7 +533,11 @@ def _find_space(x,y, L, nd=2):
 
     return result
 
+# plotting functions
 def _trim(im):
+    """
+    remove white borders
+    """
     bg = Image.new(im.mode, im.size, im.getpixel((0,0)))
     diff = ImageChops.difference(im, bg)
     diff = ImageChops.add(diff, diff, 2.0, -100)
@@ -537,8 +545,11 @@ def _trim(im):
     if bbox:
         return im.crop(bbox)
 
-def _plot_result(result, shelf_length=48, shelf_height=10, scale=10, image_folder='/Users/matthew.mu/dat/images'):
-    # all units in inch
+def _plot_one_shelf(layout, shelf_length=48, shelf_height=10, scale=10, image_folder='/Users/matthew.mu/dat/images'):
+    """
+    plot the layout of one shelf (all units in inch)
+    """
+    result = layout
 
     nl = len(result)
 
@@ -564,28 +575,32 @@ def _plot_result(result, shelf_length=48, shelf_height=10, scale=10, image_folde
         x = result_layer['x']
         y = result_layer['y']
         for i in range(len(n)):
-            sku_length = (y[i] - x[i]) / n[i]
-            try:
-                pil_im = Image.open(os.path.join(image_folder, skus[i] + '.jpg'))
-            except:
-                pil_im = Image.new('RGB', (100, 200), (211, 211, 211))
-                dr = ImageDraw.Draw(pil_im)
-                dr.rectangle(((10, 10), (90, 190)), outline=sku_color_dict[skus[i]])
-                dr.text((15, 15), f"{skus[i]}", fill="black")
+            if n[i] > 0 and y[i] - x[i] > 0:
+                sku_length = (y[i] - x[i]) / n[i]
+                try:
+                    pil_im = Image.open(os.path.join(image_folder, skus[i] + '.jpg'))
+                except:
+                    pil_im = Image.new('RGB', (100, 200), (211, 211, 211))
+                    dr = ImageDraw.Draw(pil_im)
+                    dr.rectangle(((10, 10), (90, 190)), outline=sku_color_dict[skus[i]])
+                    dr.text((15, 15), f"{skus[i]}", fill="black")
 
-            prod_im = _trim(pil_im).resize((round(sku_length * scale), shelf_height*scale), Image.ANTIALIAS)
-            x_ = x[i]
-            for j in range(n[i]):  # n[i] times
-                im.paste(prod_im, (round(x_ * scale), shelf_height*scale * layer))
-                x_ += sku_length
+                prod_im = _trim(pil_im).resize((round(sku_length * scale), shelf_height*scale), Image.ANTIALIAS)
+                x_ = x[i]
+                for j in range(n[i]):  # n[i] times
+                    im.paste(prod_im, (round(x_ * scale), shelf_height*scale * layer))
+                    x_ += sku_length
 
     return im
 
-def _plot_all_results(layout, num_row=1):
+def _plot_all_results(layout, num_row=1, shelf_length=48, shelf_height=10):
+    """
+    plot the layout of one shelf (all units in inch)
+    """
 
     images = list()
     for i in range(len(layout)):
-        images.append(_plot_result(layout[i]))
+        images.append(_plot_one_shelf(layout[i], shelf_length=shelf_length,shelf_height=shelf_height))
 
     widths, heights = zip(*(i.size for i in images))
 
@@ -615,13 +630,7 @@ def _plot_all_results(layout, num_row=1):
 
     return new_im
 
-def _trim(im):
-    bg = Image.new(im.mode, im.size, im.getpixel((0,0)))
-    diff = ImageChops.difference(im, bg)
-    diff = ImageChops.add(diff, diff, 2.0, -100)
-    bbox = diff.getbbox()
-    if bbox:
-        return im.crop(bbox)
+
 
 #TODO: need some preprocess functions
 def create_skus_info(skus, q, l):

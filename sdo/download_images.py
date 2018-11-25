@@ -13,13 +13,15 @@ df = pandas.read_csv(image_url_file)
 skus = list(df['vendorsku'].values)
 image_urls = list(df['thorImageUrl'].values)
 
+
+
 for i in range(len(skus)):
     sku = skus[i]
     if sku is not None:
         image_url = image_urls[i]
         try:
             response = requests.get(image_url)
-            img = Image.open(BytesIO(response.content))
+            img = _trim(Image.open(BytesIO(response.content)))
             img.save(os.path.join(image_folder, 'test', str(sku)+'.jpg'), 'JPEG')
         except:
             pass
