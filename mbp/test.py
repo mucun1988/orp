@@ -11,7 +11,7 @@ sys.path.extend([os.path.join('.', 'mbp')])
 
 from mbp import MinBagPacker
 
-weights = [.99]*12 + [2]*5 + [3.01] + [11.01] + [100] + [0.1]
+weights = [1]*12 + [2]*5 + [3] + [11] + [100]
 capacity = 12
 
 packer = MinBagPacker(weights, capacity, dg=100)
@@ -23,6 +23,7 @@ packer.item_bag_result
 
 weights = [8] + [6]*2
 capacity = 10
+
 packer = MinBagPacker(weights, capacity, dg=1)
 packer.greedy_pack()
 packer.bag_weights
